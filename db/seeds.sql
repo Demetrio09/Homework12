@@ -2,30 +2,16 @@ INSERT INTO departament (name) VALUES ("Engineering");
 INSERT INTO departament (name) VALUES ("Sales");
 INSERT INTO departament (name) VALUES ("Legal");
 
-INSERT INTO role (title) VALUES ("Sales Lead");
-INSERT INTO role (title) VALUES ("Salesperson");
-INSERT INTO role (title) VALUES ("Lead Engineer");
-INSERT INTO role (title) VALUES ("Software Engineer");
-INSERT INTO role (title) VALUES ("Accountant");
-INSERT INTO role (title) VALUES ("Laywer");
-INSERT INTO role (title) VALUES ("Legal Team Lead");
+INSERT INTO role (title, salary, department_id) VALUES ("Sales Lead", 100000, 2);
+INSERT INTO role (title salary, department_id) VALUES ("Salesperson", 80000, 2);
+INSERT INTO role (title salary, department_id) VALUES ("Lead Engineer", 150000, 1);
+INSERT INTO role (title salary, department_id) VALUES ("Software Engineer", 120000, 1);
+INSERT INTO role (title salary, department_id) VALUES ("Accountant", 125000, 3);
+INSERT INTO role (title salary, department_id) VALUES ("Laywer", 120000, 3);
+INSERT INTO role (title salary, department_id) VALUES ("Legal Team Lead", 190000, 3);
 
-INSERT INTO role (salary) VALUES ("100000");
-INSERT INTO role (salary) VALUES ("80000");
-INSERT INTO role (salary) VALUES ("150000");
-INSERT INTO role (salary) VALUES ("120000");
-INSERT INTO role (salary) VALUES ("125000");
-INSERT INTO role (salary) VALUES ("120000");
-INSERT INTO role (salary) VALUES ("190000");
-
-INSERT INTO employee (first_name) VALUES ("John");
-INSERT INTO employee (first_name) VALUES ("Mike");
-INSERT INTO employee (first_name) VALUES ("Sara");
-INSERT INTO employee (first_name) VALUES ("Kevin");
-INSERT INTO employee (first_name) VALUES ("Tom");
-
-INSERT INTO employee (last_name) VALUES ("Doe");
-INSERT INTO employee (last_name) VALUES ("Chan");
-INSERT INTO employee (last_name) VALUES ("Rodriguez");
-INSERT INTO employee (last_name) VALUES ("Allen");
-INSERT INTO employee (last_name) VALUES ("Brown");
+INSERT INTO employee (first_name, last_name) VALUES ("John", "Doe");
+INSERT INTO employee (first_name) VALUES ("Mike", "Chan");
+INSERT INTO employee (first_name) VALUES ("Sara", "Rodriguez");
+INSERT INTO employee (first_name) VALUES ("Kevin", "Allen");
+INSERT INTO employee (first_name) VALUES ("Tom", "Brown");
