@@ -22,7 +22,7 @@ function start() {
         .prompt({
             type: "rawlist",
             message: "What would you like to do?",
-            choices: ["View All Employees", "View All Employees By Department", "View All Employess By Manager", "Add Employee", "Remove Employee"],
+            choices: ["View All Employees", "View All Employees By Department", "View All Employess By Manager", "Add Employee", "Remove Employee", "EXIT"],
             name: "choice"
         })
         .then(function (answer) {
@@ -31,19 +31,63 @@ function start() {
                 case "View All Employees":
                     viewAllEmployees();
                     break;
-            }
-            // connection.end();
+                case "View All Employees By Department":
+                    viewAllEmployeesByDep();
+                    break;
+                case "View All Employess By Manager":
+                    getDepartments();
+                    break;
+                case "EXIT":
+                    connection.end();
+                    break;
+            };
         });
 }
 
 function viewAllEmployees() {
     const query = "SELECT first_name, last_name FROM employee";
-    connection.query(query, function(err, res) {
+    connection.query(query, function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
-            console.log(`${i+1}:  ${res[i].last_name}, ${res[i].first_name}`);
-        }
+            console.log(`${i + 1}:  ${res[i].last_name}, ${res[i].first_name}`);
+        };
+        start();
+    });
+};
+
+function getDepartments() {
+    const query = "SELECT * FROM department";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        inquirer
+            .prompt({
+                type: "rawlist",
+                message: "Choose a department:",
+                choices: () => {
+                    let choicesArray = [];
+                    for (let i = 0; i < res.length; i++) {
+                        choicesArray.push(res[i].name);
+                    }
+                    return choicesArray;
+                },
+                name: "department"
+            })
+            .then(function (answer) {
+                console.log(answer);
+            })
         // console.log(res);
-        connection.end();
-    })
+        start();
+    });
 }
+
+function viewAllEmployeesByDep() {
+    const query = "SELECT * FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id;";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(`${i + 1}:  ${res[i].last_name}, ${res[i].first_name} - ${res[i].title}`);
+        };
+        console.log(res);
+        start();
+    });
+};
