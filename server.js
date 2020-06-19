@@ -27,7 +27,23 @@ function start() {
         })
         .then(function (answer) {
             // based on the user answer
-            console.log(answer);
-            connection.end();
+            switch (answer.choice) {
+                case "View All Employees":
+                    viewAllEmployees();
+                    break;
+            }
+            // connection.end();
         });
+}
+
+function viewAllEmployees() {
+    const query = "SELECT first_name, last_name FROM employee";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(`${i+1}:  ${res[i].last_name}, ${res[i].first_name}`);
+        }
+        // console.log(res);
+        connection.end();
+    })
 }
