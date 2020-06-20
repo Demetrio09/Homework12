@@ -127,8 +127,7 @@ function addEmployee() {
             ])
             .then(function (answer) {
                 const roleChoice = answer.role.split(" ");
-                console.log(roleChoice);
-                console.log(answer.first_name + answer.last_name);
+                // console.log(answer.first_name + answer.last_name);
                 let query = "INSERT INTO employee SET ?";
                 connection.query(query,
                     {
@@ -169,11 +168,10 @@ function removeEmployee() {
             ])
             .then(function (answer) {
                 const choice = answer.choice.split(" ");
-                // console.log(choice);
                 const query = `DELETE FROM employee WHERE id = ${choice[0]}`;
                 connection.query(query, function (err, res) {
                     if (err) throw err;
-                    console.log("your employee has been deleted!");
+                    console.log("The employee has been deleted successfully!");
                     // call start function
                     start();
                 });
