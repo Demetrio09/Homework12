@@ -24,7 +24,7 @@ function start() {
         .prompt({
             type: "list",
             message: "What would you like to do?",
-            choices: ["View All Employees", "View All Employees By Department", "View All Employess By Manager", "Add Employee", "Remove Employee", "Quit"],
+            choices: ["View All Employees", "View Employees By Department", "View Employees By Manager", "Add Employee", "Remove Employee", "Quit"],
             name: "choice"
         })
         .then(function (answer) {
@@ -33,11 +33,10 @@ function start() {
                 case "View All Employees":
                     viewAllEmployees();
                     break;
-                case "View All Employees By Department":
-                    viewAllEmployeesByDep();
+                case "View Employees By Department":
+                    viewEmployeeByDep();
                     break;
-                case "View All Employess By Manager":
-                    getDepartments();
+                case "View Employees By Manager":
                     // viewAllEmployeesByMgr();
                     break;
                 case "Add Employee":
@@ -53,16 +52,8 @@ function start() {
         });
 }
 
+// function that show all employees
 function viewAllEmployees() {
-    const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
-    connection.query(query, function (err, res) {
-        if (err) throw err;
-        console.table(res);
-        start();
-    });
-}
-
-function viewAllEmployeesByDep() {
     const query = "SELECT * FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id ORDER BY employee.id";
     connection.query(query, function (err, res) {
         if (err) throw err;
@@ -71,7 +62,8 @@ function viewAllEmployeesByDep() {
     });
 }
 
-function getDepartments() {
+// function that shows employees by department.
+function viewEmployeeByDep() {
     const query = "SELECT * FROM department";
     connection.query(query, function (err, res) {
         if (err) throw err;
@@ -89,47 +81,88 @@ function getDepartments() {
                 name: "department"
             })
             .then(function (answer) {
-                console.log(answer);
-                start();
+                // console.log(answer);
+
+                const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
+
+                connection.query(query, function (err, res) {
+                    if (err) throw err;
+                    // console.log(res);
+                    for (let i = 0; i < res.length; i++) {
+                        const { department } = answer;
+                        const { name } = res[i];
+                        let employee = res[i];
+                        if (department == name) {
+                            console.table(employee);
+                        };
+                    };
+
+                    start();
+                })
             })
+    });
+}
+
+function NviewAllEmployees() {
+    const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        start();
     });
 }
 
 // function to handle additing new employess
 function addEmployee() {
-    // prompt for info about the new employee
-    inquirer
-        .prompt([
-            {
-                type: "input",
-                message: "Please enter the employee's first name:",
-                name: "first_name"
-            },
-            {
-                type: "input",
-                message: "Please enter the employee's last name:",
-                name: "last_name"
-            }
-        ])
-        .then(function (answer) {
-            console.log(answer.first_name + answer.last_name);
-            let query = "INSERT INTO employee SET ?";
-            connection.query(query,
+    const query = "SELECT department.name FROM department";
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        // prompt for info about the new employee
+        inquirer
+            .prompt([
                 {
-                    first_name: answer.first_name,
-                    last_name: answer.last_name
+                    type: "input",
+                    message: "Please enter the employee's first name:",
+                    name: "first_name"
                 },
-                function (err) {
-                    if (err) throw err;
-                    console.log("Your new employee has been added successfully!");
-                    // call start function
-                    start();
+                {
+                    type: "input",
+                    message: "Please enter the employee's last name:",
+                    name: "last_name"
+                },
+                {
+                    type: "list",
+                    message: "Please choose a department:",
+                    name: "department",
+                    choices: () => {
+                        let choicesArray = [];
+                        for (let i = 0; i < res.length; i++) {
+                            choicesArray.push(res[i])
+                        }
+                        return choicesArray;
+                    }
                 }
-            );
-        });
+            ])
+            .then(function (answer) {
+                console.log(answer.first_name + answer.last_name);
+                let query = "INSERT INTO employee SET ?";
+                connection.query(query,
+                    {
+                        first_name: answer.first_name,
+                        last_name: answer.last_name
+                    },
+                    function (err) {
+                        if (err) throw err;
+                        console.log("Your new employee has been added successfully!");
+                        // call start function
+                        start();
+                    }
+                );
+            });
+    })
 }
 
-// function that handles remove employe
+// function that handles remove employee
 function removeEmployee() {
     let query = "SELECT * FROM employee";
     connection.query(query, function (err, res) {
