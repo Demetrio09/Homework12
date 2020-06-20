@@ -1,6 +1,7 @@
 // Dependencies
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+const cTable = require("console.table");
 
 // MySQL Connection Information(credentials)
 const connection = mysql.createConnection({
@@ -41,6 +42,10 @@ function start() {
                     break;
                 case "Add Employee":
                     addEmployee();
+                    break;
+                case "Remove Employee":
+                    removeEmployee();
+                    break;
                 case "Quit":
                     connection.end();
                     break;
@@ -49,20 +54,22 @@ function start() {
 }
 
 function viewAllEmployees() {
-    const query = "SELECT * FROM employee";
+    const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
     connection.query(query, function (err, res) {
         if (err) throw err;
-        console.log(`
-id  First Name  Last Name   Title   Department  Salary  Manager
---  ----------  ---------   -----   ----------  ------  -------`);
-        for (let i = 0; i < res.length; i++) {
-            console.log(`
-${res[i].id}  ${res[i].first_name}        ${res[i].last_name}
-`)
-        };
+        console.table(res);
         start();
     });
-};
+}
+
+function viewAllEmployeesByDep() {
+    const query = "SELECT * FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id ORDER BY employee.id";
+    connection.query(query, function (err, res) {
+        if (err) throw err;
+        console.table(res);
+        start();
+    });
+}
 
 function getDepartments() {
     const query = "SELECT * FROM department";
@@ -115,21 +122,44 @@ function addEmployee() {
                 function (err) {
                     if (err) throw err;
                     console.log("Your new employee has been added successfully!");
+                    // call start function
                     start();
                 }
             );
         });
 }
 
-function viewAllEmployeesByDep() {
-    const query = "SELECT * FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id;";
+// function that handles remove employe
+function removeEmployee() {
+    let query = "SELECT * FROM employee";
     connection.query(query, function (err, res) {
         if (err) throw err;
-        for (let i = 0; i < res.length; i++) {
-            console.log(`${res[i].id}  ${res[i].last_name}, ${res[i].first_name} - ${res[i].title}; ${res[i].salary}
-            `);
-        };
-        // console.log(res);
-        start();
+        inquirer
+            .prompt([
+                {
+                    type: "list",
+                    message: "Wich employee would you like to remove?",
+                    name: "choice",
+                    choices: () => {
+                        let choicesArray = [];
+                        for (let i = 0; i < res.length; i++) {
+                            choicesArray.push(`${res[i].id} ${res[i].first_name} ${res[i].last_name}`);
+                        }
+                        return choicesArray;
+                    },
+                }
+            ])
+            .then(function (answer) {
+                const choice = answer.choice.split(" ");
+                // console.log(choice);
+                const query = `DELETE FROM employee WHERE id = ${choice[0]}`;
+                connection.query(query, function (err, res) {
+                    if (err) throw err;
+                    console.log("your employee has been deleted!");
+                    // call start function
+                    start();
+                });
+            });
     });
-};
+
+}
