@@ -54,7 +54,7 @@ function start() {
 
 // function that show all employees
 function viewAllEmployees() {
-    const query = "SELECT * FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id ORDER BY employee.id";
+    const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id ORDER BY employee.id";
     connection.query(query, function (err, res) {
         if (err) throw err;
         console.table(res);
@@ -83,23 +83,14 @@ function viewEmployeeByDep() {
             .then(function (answer) {
                 // console.log(answer);
 
-                const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
+                const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name, role.salary FROM employee LEFT JOIN role ON company_db.role.id = company_db.employee.role_id LEFT JOIN department ON role.department_id = department.id WHERE (company_db.department.name = "${answer.department}") ORDER BY employee.id`;
 
                 connection.query(query, function (err, res) {
                     if (err) throw err;
-                    // console.log(res);
-                    for (let i = 0; i < res.length; i++) {
-                        const { department } = answer;
-                        const { name } = res[i];
-                        let employee = res[i];
-                        if (department == name) {
-                            console.table(employee);
-                        };
-                    };
-
+                    console.table(res);
                     start();
-                })
-            })
+                });
+            });
     });
 }
 
@@ -114,9 +105,10 @@ function NviewAllEmployees() {
 
 // function to handle additing new employess
 function addEmployee() {
-    const query = "SELECT department.name FROM department";
+    const query = "SELECT role.id, role.title FROM role";
     connection.query(query, (err, res) => {
         if (err) throw err;
+        console.log(res);
         // prompt for info about the new employee
         inquirer
             .prompt([
@@ -132,24 +124,27 @@ function addEmployee() {
                 },
                 {
                     type: "list",
-                    message: "Please choose a department:",
-                    name: "department",
+                    message: `Please choose a role:`,
+                    name: "role",
                     choices: () => {
                         let choicesArray = [];
                         for (let i = 0; i < res.length; i++) {
-                            choicesArray.push(res[i])
+                            choicesArray.push(`${res[i].id}  ${res[i].title}`);
                         }
                         return choicesArray;
                     }
                 }
             ])
             .then(function (answer) {
+                const roleChoice = answer.role.split(" ");
+                console.log(roleChoice);
                 console.log(answer.first_name + answer.last_name);
                 let query = "INSERT INTO employee SET ?";
                 connection.query(query,
                     {
                         first_name: answer.first_name,
-                        last_name: answer.last_name
+                        last_name: answer.last_name,
+                        role_id: roleChoice[0]
                     },
                     function (err) {
                         if (err) throw err;
