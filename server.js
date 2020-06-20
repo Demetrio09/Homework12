@@ -18,11 +18,12 @@ connection.connect(function (err) {
 });
 
 function start() {
+    console.log("Welcome to our Employee Manager App!")
     inquirer
         .prompt({
-            type: "rawlist",
+            type: "list",
             message: "What would you like to do?",
-            choices: ["View All Employees", "View All Employees By Department", "View All Employess By Manager", "Add Employee", "Remove Employee", "EXIT"],
+            choices: ["View All Employees", "View All Employees By Department", "View All Employess By Manager", "Add Employee", "Remove Employee", "Quit"],
             name: "choice"
         })
         .then(function (answer) {
@@ -36,8 +37,11 @@ function start() {
                     break;
                 case "View All Employess By Manager":
                     getDepartments();
+                    // viewAllEmployeesByMgr();
                     break;
-                case "EXIT":
+                case "Add Employee":
+                    addEmployee();
+                case "Quit":
                     connection.end();
                     break;
             };
@@ -45,11 +49,16 @@ function start() {
 }
 
 function viewAllEmployees() {
-    const query = "SELECT first_name, last_name FROM employee";
+    const query = "SELECT * FROM employee";
     connection.query(query, function (err, res) {
         if (err) throw err;
+        console.log(`
+id  First Name  Last Name   Title   Department  Salary  Manager
+--  ----------  ---------   -----   ----------  ------  -------`);
         for (let i = 0; i < res.length; i++) {
-            console.log(`${i + 1}:  ${res[i].last_name}, ${res[i].first_name}`);
+            console.log(`
+${res[i].id}  ${res[i].first_name}        ${res[i].last_name}
+`)
         };
         start();
     });
@@ -61,7 +70,7 @@ function getDepartments() {
         if (err) throw err;
         inquirer
             .prompt({
-                type: "rawlist",
+                type: "list",
                 message: "Choose a department:",
                 choices: () => {
                     let choicesArray = [];
@@ -74,10 +83,42 @@ function getDepartments() {
             })
             .then(function (answer) {
                 console.log(answer);
+                start();
             })
-        // console.log(res);
-        start();
     });
+}
+
+// function to handle additing new employess
+function addEmployee() {
+    // prompt for info about the new employee
+    inquirer
+        .prompt([
+            {
+                type: "input",
+                message: "Please enter the employee's first name:",
+                name: "first_name"
+            },
+            {
+                type: "input",
+                message: "Please enter the employee's last name:",
+                name: "last_name"
+            }
+        ])
+        .then(function (answer) {
+            console.log(answer.first_name + answer.last_name);
+            let query = "INSERT INTO employee SET ?";
+            connection.query(query,
+                {
+                    first_name: answer.first_name,
+                    last_name: answer.last_name
+                },
+                function (err) {
+                    if (err) throw err;
+                    console.log("Your new employee has been added successfully!");
+                    start();
+                }
+            );
+        });
 }
 
 function viewAllEmployeesByDep() {
@@ -85,9 +126,10 @@ function viewAllEmployeesByDep() {
     connection.query(query, function (err, res) {
         if (err) throw err;
         for (let i = 0; i < res.length; i++) {
-            console.log(`${i + 1}:  ${res[i].last_name}, ${res[i].first_name} - ${res[i].title}`);
+            console.log(`${res[i].id}  ${res[i].last_name}, ${res[i].first_name} - ${res[i].title}; ${res[i].salary}
+            `);
         };
-        console.log(res);
+        // console.log(res);
         start();
     });
 };
