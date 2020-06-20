@@ -37,7 +37,7 @@ function start() {
                     viewEmployeeByDep();
                     break;
                 case "View Employees By Manager":
-                    // viewAllEmployeesByMgr();
+                    viewAllEmployeesByMgr();
                     break;
                 case "Add Employee":
                     addEmployee();
@@ -94,21 +94,11 @@ function viewEmployeeByDep() {
     });
 }
 
-function NviewAllEmployees() {
-    const query = "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.id";
-    connection.query(query, function (err, res) {
-        if (err) throw err;
-        console.table(res);
-        start();
-    });
-}
-
 // function to handle additing new employess
 function addEmployee() {
     const query = "SELECT role.id, role.title FROM role";
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.log(res);
         // prompt for info about the new employee
         inquirer
             .prompt([

@@ -15,9 +15,3 @@ INSERT INTO employee (first_name, last_name, role_id,  manager_id) VALUES ("Mike
 INSERT INTO employee (first_name, last_name, role_id) VALUES ("Sara", "Rodriguez", 7);
 INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("Kevin", "Allen", 6, 3);
 INSERT INTO employee (first_name, last_name, role_id) VALUES ("Tom", "Brown", 1);
-
- let obj = () => { for (let i = 0; i < res.length; i++) {
-            return res[i].id, res[i].first_name,  res[i].last_name,   res[i].title, res[i].name;
-        }};
-        console.log(obj);
-        console.table([obj]);
